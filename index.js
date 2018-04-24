@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   View,
   Text,
@@ -7,12 +7,13 @@ import {
   ViewPropTypes,
   Image,
   TouchableOpacity,
-  StyleSheet
-} from "react-native";
+} from 'react-native';
+
+import styles from './styles';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-const oddRowColor = "white";
-const evenRowColor = "#f2f5f7";
+const oddRowColor = 'white';
+const evenRowColor = 'white';
 
 export default class Leaderboard extends Component {
   state = {
@@ -40,13 +41,13 @@ export default class Leaderboard extends Component {
     evenRowColor: PropTypes.string
   };
 
-  _sort = data => {
+  sort = data => {
     const sortBy = this.props.sortBy;
 
     let sorted = [];
     if (this.props.sort) {
       return this.props.sort(data);
-    } else if (typeof data === "object") {
+    } else if (typeof data === 'object') {
       let sortedKeys =
         data &&
         Object.keys(data).sort((key1, key2) => {
@@ -58,7 +59,7 @@ export default class Leaderboard extends Component {
           return data[key];
         })
       );
-    } else if (typeof data === "array") {
+    } else if (typeof data === 'array') {
       return (
         data &&
         data.sort((item1, item2) => {
@@ -68,7 +69,7 @@ export default class Leaderboard extends Component {
     }
   };
 
-  _defaultRenderItem = (item, index) => {
+  defaultRenderItem = (item, index) => {
     const sortBy = this.props.sortBy;
     const evenColor = this.props.evenRowColor || evenRowColor;
     const oddColor = this.props.oddRowColor || oddRowColor;
@@ -82,10 +83,10 @@ export default class Leaderboard extends Component {
             style={[
               styles.rank,
               this.props.rankStyle,
-              index < 9 ? styles.singleDidget : styles.doubleDidget
+              index < 9 ? styles.singleDidget : styles.doubleDidget,
             ]}
           >
-            {parseInt(index) + 1}
+            {parseInt(index, 10) + 1}
           </Text>
           {this.props.icon && (
             <Image
@@ -98,35 +99,37 @@ export default class Leaderboard extends Component {
           </Text>
         </View>
         <Text style={[styles.score, this.props.scoreStyle]}>
-          {item[sortBy] || 0}
+          {item[sortBy] ? `${item[sortBy]} pts` : '0 pts'}
         </Text>
       </View>
     );
 
     return this.props.onRowPress ? (
-      <TouchableOpacity onPress={e => this.props.onRowPress(item, index)}>
+      <TouchableOpacity onPress={() => this.props.onRowPress(item, index)}>
         {rowJSx}
       </TouchableOpacity>
     ) : (
-      rowJSx
-    );
-  };
-
-  _renderItem = (item, index) => {
-    return this.props.renderItem
-      ? this.props.renderItem(item, index)
-      : this._defaultRenderItem(item, index);
+        rowJSx
+      );
   };
 
   componentWillMount() {
-    this.setState({ sortedData: this._sort(this.props.data) });
+    this.setState({ sortedData: this.sort(this.props.data) });
   }
 
-  componentWillReceiveProps = nextProps => {
+  componentWillReceiveProps = (nextProps) => {
     if (this.props.data !== nextProps.data) {
-      this.setState({ sortedData: this._sort(nextProps.data) });
+      this.setState({ sortedData: this.sort(nextProps.data) });
     }
   };
+
+  renderItem = (item, index) =>
+    (
+      this.props.renderItem
+        ? this.props.renderItem(item, index)
+        : this.defaultRenderItem(item, index)
+    );
+
 
   render() {
     const dataSource = ds.cloneWithRows(this.state.sortedData);
@@ -135,56 +138,8 @@ export default class Leaderboard extends Component {
       <ListView
         style={this.props.containerStyle}
         dataSource={dataSource}
-        renderRow={(data, someShit, i) => this._renderItem(data, i)}
+        renderRow={(data, someShit, i) => this.renderItem(data, i)}
       />
     );
   }
 }
-
-const styles = StyleSheet.create({
-  row: {
-    paddingTop: 15,
-    paddingBottom: 15,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 0.5,
-    borderRadius: 5,
-    borderColor: "#d6d7da"
-  },
-  left: {
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  rank: {
-    fontSize: 17,
-    fontWeight: "bold",
-    marginRight: 5
-  },
-  singleDidget: {
-    paddingLeft: 16,
-    paddingRight: 6
-  },
-  doubleDidget: {
-    paddingLeft: 10,
-    paddingRight: 2
-  },
-  label: {
-    fontSize: 17,
-    flex: 1,
-    paddingRight: 80
-  },
-  score: {
-    fontSize: 20,
-    fontWeight: "bold",
-    position: "absolute",
-    right: 15,
-    paddingLeft: 15
-  },
-  avatar: {
-    height: 30,
-    width: 30,
-    borderRadius: 30 / 2,
-    marginRight: 10
-  }
-});
