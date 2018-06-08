@@ -136,6 +136,7 @@ export default class Leaderboard extends Component {
 
     return (
       <ListView
+        enableEmptySections
         style={this.props.containerStyle}
         dataSource={dataSource}
         renderRow={(data, someShit, i) => this.renderItem(data, i)}
