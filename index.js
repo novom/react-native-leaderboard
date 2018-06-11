@@ -91,7 +91,7 @@ export default class Leaderboard extends Component {
           {this.props.icon && (
             <Image
               source={{ uri: item[this.props.icon] }}
-              style={[styles.avatar, this.props.avatarStyle]}
+              style={[styles.avatar, { borderColor: item.colorTeam }, this.props.avatarStyle]}
             />
           )}
           <Text style={[styles.label, this.props.labelStyle]} numberOfLines={1}>
@@ -136,6 +136,7 @@ export default class Leaderboard extends Component {
 
     return (
       <ListView
+        enableEmptySections
         style={this.props.containerStyle}
         dataSource={dataSource}
         renderRow={(data, someShit, i) => this.renderItem(data, i)}

@@ -40,10 +40,11 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
   avatar: {
-    height: 30,
-    width: 30,
-    borderRadius: 30 / 2,
+    height: 37,
+    width: 37,
+    borderRadius: 37 / 2,
     marginRight: 10,
+    borderWidth: 2,
   },
 });
 
