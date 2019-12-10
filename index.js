@@ -111,25 +111,18 @@ export default class Leaderboard extends Component {
       );
   };
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    const { data } = this.props;
-    if (data !== nextProps.data) {
-      if (prevState.prevData !== nextProps.data) {
-        return {
-          sortedData: this.sort(nextProps.data),
-        };
-      } else {
-        return prevState;
-      }
+  componentWillReceiveProps = (nextProps) => {
+    if (this.props.data !== nextProps.data) {
+      this.setState({ sortedData: this.sort(nextProps.data) });
     }
-  }
+  };
 
   componentDidMount() {
     const { data } = this.props;
     this.setState({ sortedData: this.sort(data) });
   }
 
-  renderItem = (item, index) => (
+  renderItem = ({ item, index }) => (
     this.props.renderItem
       ? this.props.renderItem(item, index)
       : this.defaultRenderItem(item, index)
@@ -139,7 +132,6 @@ export default class Leaderboard extends Component {
   render() {
     const { containerStyle } = this.props;
     const { sortedData } = this.state;
-
     return (
       <FlatList
         data={sortedData}
