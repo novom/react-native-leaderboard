@@ -2,22 +2,21 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   View,
-  Text,
-  ListView,
   ViewPropTypes,
+  Text,
+  FlatList,
   Image,
   TouchableOpacity,
 } from 'react-native';
 
 import styles from './styles';
 
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 const oddRowColor = 'white';
 const evenRowColor = 'white';
 
 export default class Leaderboard extends Component {
   state = {
-    sortedData: []
+    sortedData: [],
   };
 
   static propTypes = {
@@ -73,11 +72,10 @@ export default class Leaderboard extends Component {
     const sortBy = this.props.sortBy;
     const evenColor = this.props.evenRowColor || evenRowColor;
     const oddColor = this.props.oddRowColor || oddRowColor;
-
     const rowColor = index % 2 === 0 ? evenColor : oddColor;
 
     const rowJSx = (
-      <View style={[styles.row, { backgroundColor: rowColor }]} key={index}>
+      <View style={[styles.row, { backgroundColor: rowColor }]}>
         <View style={styles.left}>
           <Text
             style={[
@@ -113,33 +111,41 @@ export default class Leaderboard extends Component {
       );
   };
 
-  componentWillMount() {
-    this.setState({ sortedData: this.sort(this.props.data) });
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const { data } = this.props;
+    if (data !== nextProps.data) {
+      if (prevState.prevData !== nextProps.data) {
+        return {
+          sortedData: this.sort(nextProps.data),
+        };
+      } else {
+        return prevState;
+      }
+    }
   }
 
-  componentWillReceiveProps = (nextProps) => {
-    if (this.props.data !== nextProps.data) {
-      this.setState({ sortedData: this.sort(nextProps.data) });
-    }
-  };
+  componentDidMount() {
+    const { data } = this.props;
+    this.setState({ sortedData: this.sort(data) });
+  }
 
-  renderItem = (item, index) =>
-    (
-      this.props.renderItem
-        ? this.props.renderItem(item, index)
-        : this.defaultRenderItem(item, index)
-    );
+  renderItem = (item, index) => (
+    this.props.renderItem
+      ? this.props.renderItem(item, index)
+      : this.defaultRenderItem(item, index)
+  );
 
 
   render() {
-    const dataSource = ds.cloneWithRows(this.state.sortedData);
+    const { containerStyle } = this.props;
+    const { sortedData } = this.state;
 
     return (
-      <ListView
-        enableEmptySections
-        style={this.props.containerStyle}
-        dataSource={dataSource}
-        renderRow={(data, someShit, i) => this.renderItem(data, i)}
+      <FlatList
+        data={sortedData}
+        style={containerStyle}
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={data => this.renderItem(data)}
       />
     );
   }
