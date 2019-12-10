@@ -32,6 +32,7 @@ export default class Leaderboard extends Component {
     onRowPress: PropTypes.func,
     renderItem: PropTypes.func,
     containerStyle: PropTypes.object,
+    limitRows: PropTypes.number,
     scoreStyle: PropTypes.object,
     rankStyle: PropTypes.object,
     labelStyle: PropTypes.object,
@@ -113,13 +114,17 @@ export default class Leaderboard extends Component {
 
   componentWillReceiveProps = (nextProps) => {
     if (this.props.data !== nextProps.data) {
-      this.setState({ sortedData: this.sort(nextProps.data) });
+      let newSortedData = this.sort(nextProps.data);
+      if (nextProps.limitRows) newSortedData = newSortedData.slice(nextProps.limitRows);
+      this.setState({ sortedData: newSortedData });
     }
   };
 
   componentDidMount() {
-    const { data } = this.props;
-    this.setState({ sortedData: this.sort(data) });
+    const { data, limitRows } = this.props;
+    let newSortedData = this.sort(data);
+    if (limitRows) newSortedData = newSortedData.slice(limitRows);
+    this.setState({ sortedData: newSortedData });
   }
 
   renderItem = ({ item, index }) => (
