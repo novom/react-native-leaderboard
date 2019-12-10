@@ -115,7 +115,7 @@ export default class Leaderboard extends Component {
   componentWillReceiveProps = (nextProps) => {
     if (this.props.data !== nextProps.data) {
       let newSortedData = this.sort(nextProps.data);
-      if (nextProps.limitRows) newSortedData = newSortedData.slice(nextProps.limitRows);
+      if (nextProps.limitRows) newSortedData = newSortedData.slice(0, nextProps.limitRows);
       this.setState({ sortedData: newSortedData });
     }
   };
@@ -123,7 +123,7 @@ export default class Leaderboard extends Component {
   componentDidMount() {
     const { data, limitRows } = this.props;
     let newSortedData = this.sort(data);
-    if (limitRows) newSortedData = newSortedData.slice(limitRows);
+    if (limitRows) newSortedData = newSortedData.slice(0, limitRows);
     this.setState({ sortedData: newSortedData });
   }
 
